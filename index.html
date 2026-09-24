@@ -1116,6 +1116,8 @@ document.querySelectorAll('.worktab-btn').forEach(b=>{
     b.classList.add('active');
     const pane=b.dataset.tab;
     document.querySelectorAll('.work-pane').forEach(p=>p.classList.toggle('hidden',p.dataset.pane!==pane));
+    // 强制显示刚激活面板内的 reveal 元素（隐藏容器里的 IntersectionObserver 不会触发）
+    document.querySelectorAll('.work-pane[data-pane="'+pane+'"] .reveal').forEach(el=>el.classList.add('in'));
   });
 });
 
