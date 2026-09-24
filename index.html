@@ -115,6 +115,8 @@ nav{
 .hero-title .dot{color:var(--accent)}
 .hero-learn{position:relative;z-index:3;margin-top:clamp(4px,1vh,16px)}
 .btn.hero-learn{padding:20px clamp(40px,6vw,70px);font-size:clamp(1rem,1.3vw,1.18rem);border-radius:999px;letter-spacing:.05em}
+.btn.hero-learn{transition:background .5s cubic-bezier(.22,1,.36,1),color .5s cubic-bezier(.22,1,.36,1),transform .35s cubic-bezier(.22,1,.36,1),box-shadow .5s}
+.btn.hero-learn:hover{background:#1308FE;color:#fff;transform:translateY(-2px);box-shadow:0 12px 34px -14px rgba(19,8,254,.55)}
 .hero-cta{display:flex;flex-wrap:wrap;gap:14px;margin-top:38px}
 .btn{
   display:inline-flex;align-items:center;gap:10px;cursor:pointer;
@@ -512,12 +514,6 @@ footer{border-top:1px solid var(--line);padding:34px 0;font-size:.8rem;color:var
   .reveal{opacity:1;transform:none}
 }
 
-.gyro-hint{position:fixed;left:50%;bottom:clamp(14px,6vh,40px);transform:translateX(-50%);z-index:60;
-  padding:10px 18px;border-radius:999px;background:rgba(13,11,10,.8);color:#f2ede4;font-size:.82rem;
-  letter-spacing:.04em;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
-  border:1px solid rgba(239,231,224,.14);transition:opacity .5s,transform .5s;pointer-events:none}
-.gyro-hint.hide{opacity:0;transform:translateX(-50%) translateY(8px)}
-@media(min-width:521px){.gyro-hint{display:none}}
 </style>
 </head>
 <body>
@@ -1253,17 +1249,10 @@ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
   function enable(){ window.addEventListener('deviceorientation', onOrient, {passive:true}); }
   var isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent||'');
   if(isIOS && typeof DeviceOrientationEvent!=='undefined' && typeof DeviceOrientationEvent.requestPermission==='function'){
-    // 一次性提示：iOS 需先点击授权陀螺仪
-    var hint=document.createElement('div');
-    hint.className='gyro-hint';
-    hint.textContent='轻点页面开启晃动动效';
-    document.body.appendChild(hint);
     var ask=function(){
       DeviceOrientationEvent.requestPermission().then(function(state){
         if(state==='granted'){
           enable();
-          hint.classList.add('hide');
-          setTimeout(function(){ if(hint.parentNode) hint.parentNode.removeChild(hint); }, 500);
         }
       }).catch(function(){});
       document.removeEventListener('touchstart', ask);
