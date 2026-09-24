@@ -1231,14 +1231,14 @@ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
   if(!stage) return;
   let target=0, current=0, raf=null;
   function frame(){
-    current += (target-current)*0.09;
+    current += (target-current)*0.14;
     if(Math.abs(target-current)<0.08) current=target;
     stage.style.transform='translate(-50%, -50%) translateX('+current.toFixed(2)+'px)';
     if(Math.abs(target-current)>0.08){ raf=requestAnimationFrame(frame); } else { raf=null; }
   }
   window.addEventListener('deviceorientation', e=>{
     if(typeof e.gamma!=='number') return;
-    target = Math.max(-70, Math.min(70, -e.gamma*1.4));
+    target = Math.max(-95, Math.min(95, -e.gamma*2.0));
     if(!raf) raf=requestAnimationFrame(frame);
   }, {passive:true});
 })();
