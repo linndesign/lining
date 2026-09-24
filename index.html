@@ -45,8 +45,10 @@ body::after{
 nav{
   position:fixed;top:0;left:0;right:0;z-index:100;
   padding:22px 0;
-  backdrop-filter:blur(8px);
-  background:linear-gradient(var(--bg),rgba(13,11,10,.82));
+  -webkit-backdrop-filter:blur(14px) saturate(130%);
+  backdrop-filter:blur(14px) saturate(130%);
+  background:linear-gradient(var(--bg),rgba(13,11,10,.7));
+  border-bottom:1px solid rgba(239,231,224,.08);
 }
 .nav-in{display:flex;align-items:center;justify-content:space-between}
 .logo{font-family:var(--serif);font-weight:800;font-size:1.15rem;letter-spacing:.02em;transform:scaleX(.9);transform-origin:left center}
@@ -269,7 +271,7 @@ footer{border-top:1px solid var(--line);padding:34px 0;font-size:.8rem;color:var
   .nav-links a{display:none}
   .nav-links .lang{display:none}
   .hamb{display:inline-flex}
-  .hero-title{font-size:clamp(3.8rem,23.5vw,8.8rem)}
+  .hero-title{font-size:clamp(2.6rem,16vw,8.8rem);letter-spacing:-.05em}
 }
 
 /* ===== WORK GALLERY ===== */
@@ -1236,11 +1238,26 @@ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
     stage.style.transform='translate(-50%, -50%) translateX('+current.toFixed(2)+'px)';
     if(Math.abs(target-current)>0.08){ raf=requestAnimationFrame(frame); } else { raf=null; }
   }
-  window.addEventListener('deviceorientation', e=>{
+  function onOrient(e){
     if(typeof e.gamma!=='number') return;
     target = Math.max(-95, Math.min(95, -e.gamma*2.0));
     if(!raf) raf=requestAnimationFrame(frame);
-  }, {passive:true});
+  }
+  // iOS 13+ Safari 需用户手势授权陀螺仪，授权后即可晃动生效
+  var isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent||'');
+  if(isIOS && typeof DeviceOrientationEvent!=='undefined' && typeof DeviceOrientationEvent.requestPermission==='function'){
+    var ask=function(){
+      DeviceOrientationEvent.requestPermission().then(function(state){
+        if(state==='granted') window.addEventListener('deviceorientation', onOrient, {passive:true});
+      }).catch(function(){});
+      document.removeEventListener('touchstart', ask);
+      document.removeEventListener('pointerdown', ask);
+    };
+    document.addEventListener('touchstart', ask, {once:true, passive:true});
+    document.addEventListener('pointerdown', ask, {once:true});
+  } else {
+    window.addEventListener('deviceorientation', onOrient, {passive:true});
+  }
 })();
 </script>
 <div class="copy-toast" id="copyToast" role="status" aria-live="polite"></div>
