@@ -491,6 +491,8 @@ footer{border-top:1px solid var(--line);padding:34px 0;font-size:.8rem;color:var
 .avatar-zoom img{max-width:min(86vw,560px);max-height:86vh;width:auto;height:auto;border-radius:16px;object-fit:contain;box-shadow:0 30px 90px rgba(0,0,0,.55)}
 .avatar-zoom .z-close{position:absolute;top:22px;right:26px;width:46px;height:46px;border-radius:50%;border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.06);color:#fff;font-size:1.5rem;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .2s,transform .2s,background .2s}
 .avatar-zoom .z-close:hover{border-color:var(--accent);background:rgba(255,74,46,.15);transform:rotate(90deg)}
+.copy-toast{position:fixed;left:50%;bottom:34px;transform:translate(-50%,24px);background:rgba(13,11,10,.93);border:1px solid var(--accent);color:#fff;padding:12px 24px;border-radius:999px;font-size:.92rem;letter-spacing:.02em;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;z-index:4000;white-space:nowrap;box-shadow:0 12px 40px rgba(0,0,0,.4)}
+.copy-toast.show{opacity:1;transform:translate(-50%,0)}
 
 /* ===== REDUCED MOTION ===== */
 @media (prefers-reduced-motion:reduce){
@@ -932,6 +934,7 @@ const I18N = {
     "contact.s4":"GitHub",
     "contact.cta":"发我邮件",
     "footer.copy":"© 2026 LINING · 保留所有权利",
+    "copy.msg":"© LINING · 图片受版权保护，请勿另存",
     "footer":"墨与用心",
     "sec.about":"关于","sec.work":"作品","sec.contact":"联系",
     "case.h.bg":"背景","case.h.role":"我的角色","case.h.proc":"设计过程","case.h.key":"关键决策","case.h.out":"上线","case.wl.mall":"积分商城 · 国内版","case.crm.ok":"OK 合伙人 · 获客小程序",
@@ -1048,6 +1051,7 @@ const I18N = {
     "contact.s4":"GitHub",
     "contact.cta":"Email Me",
     "footer.copy":"© 2026 LINING. All rights reserved.",
+    "copy.msg":"© LINING · Images are copyrighted. Please do not save.",
     "footer":"Designed with ink & care",
     "sec.about":"About","sec.work":"Work","sec.contact":"Contact",
     "case.h.bg":"Background","case.h.role":"My Role","case.h.proc":"Process","case.h.key":"Key Decisions","case.h.out":"Outcome","case.wl.mall":"Points Mall · Domestic","case.crm.ok":"OK Partner · Acquisition Mini-program",
@@ -1159,11 +1163,31 @@ if(avatarBtn&&avatarZoom&&avatarClose){
   document.addEventListener('keydown',e=>{if(e.key==='Escape')avatarZoom.classList.remove('open');});
 }
 
+/* ===== 版权保护：禁止图片另存 ===== */
+let copyTimer=null;
+function showCopyToast(){
+  const copyToast=document.getElementById('copyToast');
+  if(!copyToast) return;
+  const lang=document.documentElement.lang==='en'?'en':'zh';
+  const msg=(I18N[lang]||I18N.zh)['copy.msg']||'© LINING';
+  copyToast.textContent=msg;
+  copyToast.classList.add('show');
+  clearTimeout(copyTimer);
+  copyTimer=setTimeout(()=>copyToast.classList.remove('show'),1700);
+}
+document.addEventListener('contextmenu',e=>{
+  if(e.target.closest('img, figure, .uicard-media')){ e.preventDefault(); showCopyToast(); }
+});
+document.addEventListener('dragstart',e=>{
+  if(e.target&&e.target.tagName==='IMG'){ e.preventDefault(); showCopyToast(); }
+});
+
 /* ===== 滚动揭示 ===== */
 const io=new IntersectionObserver(entries=>{
   entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
 },{threshold:.15});
 document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 </script>
+<div class="copy-toast" id="copyToast" role="status" aria-live="polite"></div>
 </body>
 </html>
